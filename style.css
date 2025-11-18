@@ -62,7 +62,10 @@ body {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  /* keep wrapped rows stacked at the top; generator ensures content fits so hide scrollbar */
+  align-content: flex-start;
+  align-items: flex-start;
+  overflow: hidden;
 }
 
 .bubble{
@@ -76,8 +79,59 @@ body {
   background-color: black;
   border-radius: 50%;
   cursor: pointer;
+  /* prevent bubbles from stretching and ensure they stay within flex lines */
+  flex: 0 0 auto;
 }
 
 .bubble:hover{
   background-color: rgba(102, 102, 102, 0.989);
+}
+
+/* Hide any scrollbar just in case (cross-browser) while preserving touch scroll behavior where supported */
+#pbtm {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+#pbtm::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+/* Responsive adjustments for small screens (phones) */
+@media (max-width: 480px) {
+  #panel {
+    width: 95%;
+    height: 95%;
+    border-radius: 8px;
+  }
+
+  /* Top panel: reduce paddings and allow wrapping if space is tight */
+  #ptop {
+    padding: 0 0.75rem;
+    height: 72px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .elem h2 {
+    font-size: 14px;
+  }
+
+  .box {
+    font-size: 18px;
+    padding: 8px 12px;
+  }
+
+  #pbtm{
+    padding: 8px;
+    gap: 8px;
+  }
+
+  /* Make bubbles scale with viewport while keeping a reasonable minimum */
+  .bubble{
+    width: 10vmin;
+    height: 10vmin;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: clamp(14px, 4vmin, 18px);
+  }
 }
