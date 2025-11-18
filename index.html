@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
+  <title>Bubble Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -26,10 +26,21 @@
         </div>
       </div>
       <div id="pbtm">
-
+        <!-- bubbles injected here -->
       </div>
     </div>
   </div>
+
+  <!-- Modal / Overlay (used for start screen and end screen) -->
+  <div id="overlay" class="overlay">
+    <div class="modal" id="modalContent">
+      <!-- Content is injected by JS: initial Play button, or game over + score + Play Again -->
+      <h2>Bubble Game</h2>
+      <p>Click below to start playing!</p>
+      <button id="playBtn" class="btn">Play Game</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 
