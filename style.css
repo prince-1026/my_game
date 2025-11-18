@@ -66,6 +66,7 @@ body {
   align-content: flex-start;
   align-items: flex-start;
   overflow: hidden;
+  /* while game is not running, we'll block pointer events via JS by toggling class */
 }
 
 .bubble{
@@ -96,7 +97,55 @@ body {
   display: none; /* Safari and Chrome */
 }
 
-/* Responsive adjustments for small screens (phones) */
+/* Modal / overlay styles */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.modal {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 280px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.modal h2 {
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.modal p {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.btn {
+  background: #0898f1;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: 0.95;
+}
+
+/* Small-screen responsive tweaks */
 @media (max-width: 480px) {
   #panel {
     width: 95%;
