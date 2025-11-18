@@ -1,13 +1,47 @@
-
 const pbtm = document.querySelector('#pbtm');
+const hitDisplay = document.querySelector('#hitval');
+const timerDisplay = document.querySelector('#timerval');
+const scoreDisplay = document.querySelector('#scoreval');
 
+const overlay = document.querySelector('#overlay');
+const modalContent = document.querySelector('#modalContent');
 
-let timers = 60;
-let hitgen;
+let totalTimeDefault = 60; // seconds
+let timers = totalTimeDefault;
+let hitgenVal = 0;
 let score = 0;
+let timerInterval = null;
+let isRunning = false;
 
+// --- UI / modal helpers ---
+function showModal(htmlContent) {
+  modalContent.innerHTML = htmlContent;
+  overlay.classList.remove('hidden');
+}
 
+function hideModal() {
+  overlay.classList.add('hidden');
+}
 
+// initial modal (start screen)
+showModal(`
+  <h2>Bubble Game</h2>
+  <p>Click below to start playing!</p>
+  <button id="playBtn" class="btn">Play Game</button>
+`);
+
+// ensure overlay button works for start & later (delegate)
+overlay.addEventListener('click', (e) => {
+  // only handle clicks on buttons (play / play again)
+  if (e.target && e.target.tagName === 'BUTTON') {
+    const id = e.target.id;
+    if (id === 'playBtn' || id === 'playAgainBtn') {
+      startGame();
+    }
+  }
+});
+
+// --- bubble generation ---
 function bubblegenerator() {
     // Clear existing bubbles
     pbtm.innerHTML = ''
@@ -51,129 +85,111 @@ function bubblegenerator() {
     }
 }
 
+// --- hit generator ---
 function hitgenerator() {
-    hitgen = Math.floor(Math.random() * 10)
-    document.querySelector('#hitval').textContent = hitgen
+    hitgenVal = Math.floor(Math.random() * 10)
+    hitDisplay.textContent = hitgenVal
 }
 
+// --- timer logic ---
 function runtimer() {
-    let intervaltime = setInterval(() => {
+    // clear any existing timer
+    if (timerInterval) clearInterval(timerInterval)
+
+    timerInterval = setInterval(() => {
         if (timers > 0) {
             timers--;
-            document.querySelector('#timerval').innerText = timers
+            timerDisplay.innerText = timers
         } else {
-            clearInterval(intervaltime)
-           pbtm.innerHTML='<h1>Game Over</h1>'
-
+            clearInterval(timerInterval)
+            endGame()
         }
     }, 1000)
 }
 
+// --- score ---
 function incresescore() {
     score += 10
-    document.querySelector('#scoreval').textContent = score
+    scoreDisplay.textContent = score
 }
 
+// --- game start / end / reset ---
+function startGame() {
+    // initialize values
+    timers = totalTimeDefault
+    score = 0
+    scoreDisplay.textContent = score
+    timerDisplay.textContent = timers
 
+    isRunning = true
+    // hide modal
+    hideModal()
+
+    // generate starting board and targets
+    bubblegenerator()
+    hitgenerator()
+
+    // start timer
+    runtimer()
+
+    // ensure pbtm accepts pointer events (if previously blocked)
+    pbtm.style.pointerEvents = 'auto'
+}
+
+function endGame() {
+    isRunning = false
+    // block board interaction
+    pbtm.style.pointerEvents = 'none'
+
+    // show final modal with score and "Play Again" button
+    showModal(`
+      <h2>Time's up!</h2>
+      <p>Your score: <strong>${score}</strong></p>
+      <button id="playAgainBtn" class="btn">Play Again</button>
+    `)
+}
+
+function resetGame() {
+    // stop timer
+    if (timerInterval) {
+      clearInterval(timerInterval)
+      timerInterval = null
+    }
+
+    // reset displays
+    timers = totalTimeDefault
+    timerDisplay.textContent = timers
+    score = 0
+    scoreDisplay.textContent = score
+
+    // clear bubbles
+    pbtm.innerHTML = ''
+    hitDisplay.textContent = '-'
+    isRunning = false
+
+    // show initial start modal
+    showModal(`
+      <h2>Bubble Game</h2>
+      <p>Click below to start playing!</p>
+      <button id="playBtn" class="btn">Play Game</button>
+    `)
+    pbtm.style.pointerEvents = 'none'
+}
+
+// --- click handling on bubbles ---
 pbtm.addEventListener('click', (e) => {
-    let clickval = parseInt(e.target.innerText)
-    if (clickval === hitgen) {
-        incresescore()
-        hitgenerator()
-        bubblegenerator();
+    if (!isRunning) return // ignore clicks when not running
+    if (e.target && e.target.classList.contains('bubble')) {
+        let clickval = parseInt(e.target.innerText)
+        if (!isNaN(clickval) && clickval === hitgenVal) {
+            incresescore()
+            hitgenerator()
+            bubblegenerator()
+        }
     }
 })
 
-
-bubblegenerator();
-runtimer()
-hitgenerator()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const pbtm = document.querySelector('#pbtm')
-// let bubbles = '';
-
-// for (let i = 0; i <= 100; i++) {
-//     bubbles += `<div id="bubbley" class="bubble">4</div>`
-// }
-
-// pbtm.innerHTML = bubbles
+// --- initial setup: show start modal and block board until start ---
+pbtm.style.pointerEvents = 'none'
+timerDisplay.textContent = totalTimeDefault
+scoreDisplay.textContent = 0
